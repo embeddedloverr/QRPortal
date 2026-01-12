@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Equipment Portal - System Flowchart</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            color: #1a1a2e;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #3b82f6;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .flowchart-image {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .flowchart-image img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .legend h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .blue {
+            background: #60a5fa;
+        }
+
+        .green {
+            background: #4ade80;
+        }
+
+        .orange {
+            background: #fb923c;
+        }
+
+        .purple {
+            background: #c084fc;
+        }
+
+        .yellow {
+            background: #facc15;
+        }
+
+        .gray {
+            background: #9ca3af;
+        }
+
+        .roles {
+            margin-top: 30px;
+        }
+
+        .roles h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .role-card {
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .role-card.user {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+
+        .role-card.engineer {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+
+        .role-card.supervisor {
+            background: #faf5ff;
+            border-color: #a855f7;
+        }
+
+        .role-card.admin {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        .role-card h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .role-card p {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .flowchart-image img {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>QR Equipment Complaint Portal</h1>
+        <p>System Workflow & Process Flowchart</p>
+    </div>
+
+    <div class="flowchart-image">
+        <img src="qr_portal_flowchart_v2.png" alt="QR Portal Workflow Flowchart">
+    </div>
+
+    <div class="legend">
+        <h3>Color Legend</h3>
+        <div class="legend-grid">
+            <div class="legend-item">
+                <div class="legend-color blue"></div>
+                <span>User Actions</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color green"></div>
+                <span>System Actions</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color orange"></div>
+                <span>Engineer Actions</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color purple"></div>
+                <span>Supervisor Actions</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color yellow"></div>
+                <span>Decision Points</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color gray"></div>
+                <span>Start/End Points</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="roles">
+        <h3>User Roles & Responsibilities</h3>
+        <div class="role-grid">
+            <div class="role-card user">
+                <h4>User</h4>
+                <p>Scans QR codes, creates tickets, tracks complaint status</p>
+            </div>
+            <div class="role-card engineer">
+                <h4>Engineer</h4>
+                <p>Attends tickets, performs service, uploads photos</p>
+            </div>
+            <div class="role-card supervisor">
+                <h4>Supervisor</h4>
+                <p>Assigns tickets, verifies completed work, approves/rejects</p>
+            </div>
+            <div class="role-card admin">
+                <h4>Admin</h4>
+                <p>Manages users, equipment, and system configuration</p>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+
+</html>
