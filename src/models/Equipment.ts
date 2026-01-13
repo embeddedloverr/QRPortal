@@ -7,7 +7,7 @@ export interface IEquipment extends Document {
     serialNumber?: string;
     // Extended optional fields
     make?: string;
-    model?: string;
+    modelNumber?: string;
     manufacturer?: string;
     capacity?: string;
     powerRating?: string;
@@ -79,7 +79,7 @@ const EquipmentSchema = new Schema<IEquipment>(
         serialNumber: { type: String, trim: true },
         // Extended fields
         make: { type: String, trim: true },
-        model: { type: String, trim: true },
+        modelNumber: { type: String, trim: true },
         manufacturer: { type: String, trim: true },
         capacity: { type: String, trim: true },
         powerRating: { type: String, trim: true },
