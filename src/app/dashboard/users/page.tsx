@@ -76,6 +76,16 @@ export default function UsersPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: '',
+        role: 'user',
+        phone: '',
+        department: '',
+    });
 
     useEffect(() => {
         fetchUsers();
@@ -93,6 +103,31 @@ export default function UsersPage() {
             console.error('Error fetching users:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            if (res.ok) {
+                setShowModal(false);
+                setFormData({ name: '', email: '', password: '', role: 'user', phone: '', department: '' });
+                fetchUsers();
+            } else {
+                const data = await res.json();
+                alert(data.error || 'Failed to create user');
+            }
+        } catch (error) {
+            console.error('Error creating user:', error);
+            alert('Failed to create user');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -122,7 +157,7 @@ export default function UsersPage() {
                     </p>
                 </div>
                 {userRole === 'admin' && (
-                    <Button variant="primary" leftIcon={<UserPlus size={20} />}>
+                    <Button variant="primary" leftIcon={<UserPlus size={20} />} onClick={() => setShowModal(true)}>
                         Add User
                     </Button>
                 )}
@@ -240,6 +275,66 @@ export default function UsersPage() {
                     ))}
                 </motion.div>
             )}
+
+            {/* Add User Modal */}
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Add New User">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <Input
+                        label="Name"
+                        placeholder="Enter full name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                    />
+                    <Input
+                        label="Email"
+                        type="email"
+                        placeholder="Enter email address"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        required
+                    />
+                    <Input
+                        label="Password"
+                        type="password"
+                        placeholder="Enter password (min 6 characters)"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        required
+                    />
+                    <Select
+                        label="Role"
+                        options={[
+                            { value: 'user', label: 'User' },
+                            { value: 'engineer', label: 'Engineer' },
+                            { value: 'supervisor', label: 'Supervisor' },
+                            { value: 'admin', label: 'Admin' },
+                        ]}
+                        value={formData.role}
+                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    />
+                    <Input
+                        label="Phone (optional)"
+                        placeholder="Enter phone number"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                    <Input
+                        label="Department (optional)"
+                        placeholder="Enter department"
+                        value={formData.department}
+                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                    />
+                    <div className="flex gap-3 pt-4">
+                        <Button type="button" variant="ghost" onClick={() => setShowModal(false)} className="flex-1">
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="primary" isLoading={submitting} className="flex-1">
+                            Create User
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }
