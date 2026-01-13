@@ -224,6 +224,22 @@ export default function EquipmentPage() {
         }
     };
 
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+
+        try {
+            const res = await fetch(`/api/equipment/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                fetchEquipment();
+            } else {
+                alert('Failed to delete equipment');
+            }
+        } catch (error) {
+            console.error('Error deleting equipment:', error);
+            alert('Failed to delete equipment');
+        }
+    };
+
     const filteredEquipment = equipment.filter((eq) =>
         eq.name.toLowerCase().includes(search.toLowerCase()) ||
         eq.qrCode.toLowerCase().includes(search.toLowerCase()) ||
@@ -375,15 +391,24 @@ export default function EquipmentPage() {
                                 {/* Quick Actions */}
                                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <div className="flex gap-1">
-                                        <button className="p-2 rounded-lg bg-dark-100 dark:bg-dark-700 hover:bg-dark-200 dark:hover:bg-dark-600 transition-colors">
+                                        <button
+                                            onClick={() => router.push(`/dashboard/equipment/${eq._id}`)}
+                                            className="p-2 rounded-lg bg-dark-100 dark:bg-dark-700 hover:bg-dark-200 dark:hover:bg-dark-600 transition-colors"
+                                        >
                                             <Eye size={16} className="text-dark-500" />
                                         </button>
                                         {canManage && (
                                             <>
-                                                <button className="p-2 rounded-lg bg-dark-100 dark:bg-dark-700 hover:bg-dark-200 dark:hover:bg-dark-600 transition-colors">
+                                                <button
+                                                    onClick={() => router.push(`/dashboard/equipment/${eq._id}?edit=true`)}
+                                                    className="p-2 rounded-lg bg-dark-100 dark:bg-dark-700 hover:bg-dark-200 dark:hover:bg-dark-600 transition-colors"
+                                                >
                                                     <Edit size={16} className="text-dark-500" />
                                                 </button>
-                                                <button className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                                                <button
+                                                    onClick={() => handleDelete(eq._id, eq.name)}
+                                                    className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                                                >
                                                     <Trash2 size={16} className="text-red-500" />
                                                 </button>
                                             </>
@@ -436,11 +461,17 @@ export default function EquipmentPage() {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
-                                                <button className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-700 transition-colors">
+                                                <button
+                                                    onClick={() => router.push(`/dashboard/equipment/${eq._id}`)}
+                                                    className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-700 transition-colors"
+                                                >
                                                     <Eye size={16} className="text-dark-500" />
                                                 </button>
                                                 {canManage && (
-                                                    <button className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-700 transition-colors">
+                                                    <button
+                                                        onClick={() => router.push(`/dashboard/equipment/${eq._id}?edit=true`)}
+                                                        className="p-2 rounded-lg hover:bg-dark-100 dark:hover:bg-dark-700 transition-colors"
+                                                    >
                                                         <Edit size={16} className="text-dark-500" />
                                                     </button>
                                                 )}
