@@ -25,6 +25,7 @@ import {
     Calendar,
     Printer,
     Map,
+    Building2,
 } from 'lucide-react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import NotificationBell from '@/components/features/NotificationBell';
@@ -47,6 +48,8 @@ const navItems: NavItem[] = [
     { name: 'Floor Maps', href: '/dashboard/floor-maps', icon: <Map size={20} />, roles: ['admin', 'supervisor'] },
     { name: 'QR Print', href: '/dashboard/qr-print', icon: <Printer size={20} />, roles: ['admin', 'supervisor'] },
     { name: 'Equipment Types', href: '/dashboard/equipment-types', icon: <Tags size={20} />, roles: ['admin', 'supervisor'] },
+    { name: 'Clients', href: '/dashboard/clients', icon: <Building2 size={20} />, roles: ['admin'] },
+    { name: 'Areas', href: '/dashboard/areas', icon: <Map size={20} />, roles: ['admin'] },
     { name: 'Users', href: '/dashboard/users', icon: <Users size={20} />, roles: ['admin'] },
     { name: 'Settings', href: '/dashboard/settings', icon: <Settings size={20} /> },
 ];

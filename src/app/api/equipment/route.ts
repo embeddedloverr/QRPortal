@@ -75,6 +75,8 @@ export async function POST(req: NextRequest) {
             type: body.type, // Now accepts any string (references EquipmentType.code)
             qrCode,
             location: {
+                client: body.location?.client,
+                areaRef: body.location?.areaRef,
                 building: body.location.building,
                 floor: body.location.floor,
                 room: body.location.room,

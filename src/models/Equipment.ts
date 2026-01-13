@@ -23,10 +23,12 @@ export interface IEquipment extends Document {
     barcode?: string;
     // Location
     location: {
+        client?: Schema.Types.ObjectId;
+        areaRef?: Schema.Types.ObjectId;
         building: string;
         floor: string;
         room: string;
-        area?: string;
+        area?: string; // Specific zone/wing (text)
         coordinates?: string;
     };
     // Supplier
@@ -95,10 +97,12 @@ const EquipmentSchema = new Schema<IEquipment>(
         barcode: { type: String, trim: true },
         // Location
         location: {
+            client: { type: Schema.Types.ObjectId, ref: 'Client' },
+            areaRef: { type: Schema.Types.ObjectId, ref: 'Area' },
             building: { type: String, required: [true, 'Building is required'], trim: true },
             floor: { type: String, required: [true, 'Floor is required'], trim: true },
             room: { type: String, required: [true, 'Room is required'], trim: true },
-            area: { type: String, trim: true },
+            area: { type: String, trim: true }, // Specific zone/wing
             coordinates: { type: String, trim: true },
         },
         // Supplier

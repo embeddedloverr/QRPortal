@@ -21,6 +21,20 @@ interface EquipmentTypeOption {
     label: string;
 }
 
+interface Client {
+    _id: string;
+    name: string;
+    code: string;
+}
+
+interface Area {
+    _id: string;
+    name: string;
+    code: string;
+    building?: string;
+    floor?: string;
+}
+
 const defaultTypes = [
     { value: 'ac_unit', label: 'AC Unit' },
     { value: 'pump', label: 'Pump' },
@@ -35,6 +49,8 @@ export default function NewEquipmentPage() {
     const userRole = (session?.user as any)?.role;
 
     const [customTypes, setCustomTypes] = useState<EquipmentTypeOption[]>([]);
+    const [clients, setClients] = useState<Client[]>([]);
+    const [areas, setAreas] = useState<Area[]>([]);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
 
@@ -61,6 +77,8 @@ export default function NewEquipmentPage() {
         assetTag: '',
         barcode: '',
         // Location
+        client: '',
+        areaId: '',
         building: '',
         floor: '',
         room: '',
@@ -86,6 +104,7 @@ export default function NewEquipmentPage() {
 
     useEffect(() => {
         fetchEquipmentTypes();
+        fetchClients();
     }, []);
 
     const fetchEquipmentTypes = async () => {
@@ -98,6 +117,45 @@ export default function NewEquipmentPage() {
         } catch (error) {
             console.error('Error fetching equipment types:', error);
         }
+    };
+
+    const fetchClients = async () => {
+        try {
+            const res = await fetch('/api/clients?active=true');
+            const data = await res.json();
+            setClients(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('Error fetching clients:', error);
+        }
+    };
+
+    const fetchAreas = async (clientId: string) => {
+        if (!clientId) {
+            setAreas([]);
+            return;
+        }
+        try {
+            const res = await fetch(`/api/areas?client=${clientId}&active=true`);
+            const data = await res.json();
+            setAreas(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error('Error fetching areas:', error);
+        }
+    };
+
+    const handleClientChange = (clientId: string) => {
+        setFormData(prev => ({ ...prev, client: clientId, areaId: '', building: '', floor: '' }));
+        fetchAreas(clientId);
+    };
+
+    const handleAreaChange = (areaId: string) => {
+        const area = areas.find(a => a._id === areaId);
+        setFormData(prev => ({
+            ...prev,
+            areaId,
+            building: area?.building || prev.building,
+            floor: area?.floor || prev.floor,
+        }));
     };
 
     const handleChange = (field: string, value: string) => {
@@ -133,6 +191,8 @@ export default function NewEquipmentPage() {
                     assetTag: formData.assetTag || undefined,
                     barcode: formData.barcode || undefined,
                     location: {
+                        client: formData.client || undefined,
+                        areaRef: formData.areaId || undefined,
                         building: formData.building,
                         floor: formData.floor,
                         room: formData.room,
@@ -330,7 +390,23 @@ export default function NewEquipmentPage() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <Select
+                            label="Client *"
+                            options={clients.map(c => ({ value: c._id, label: c.name }))}
+                            value={formData.client}
+                            onChange={(e) => handleClientChange(e.target.value)}
+                            placeholder="Select client"
+                            required
+                        />
+                        <Select
+                            label="Area/Location"
+                            options={areas.map(a => ({ value: a._id, label: `${a.name} (${a.code})` }))}
+                            value={formData.areaId}
+                            onChange={(e) => handleAreaChange(e.target.value)}
+                            placeholder={formData.client ? 'Select area' : 'Select client first'}
+                            disabled={!formData.client}
+                        />
                         <Input
                             label="Building *"
                             placeholder="e.g., Building A"
@@ -353,7 +429,7 @@ export default function NewEquipmentPage() {
                             required
                         />
                         <Input
-                            label="Area/Zone"
+                            label="Zone/Wing"
                             placeholder="e.g., East Wing"
                             value={formData.area}
                             onChange={(e) => handleChange('area', e.target.value)}
