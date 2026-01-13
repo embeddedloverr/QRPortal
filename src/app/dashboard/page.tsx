@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import {
     Ticket,
     Wrench,
@@ -34,30 +35,53 @@ export default function DashboardPage() {
     const userRole = (session?.user as any)?.role || 'user';
     const userName = session?.user?.name || 'User';
 
-    // Mock stats data - in real app, fetch from API
-    const stats = {
-        user: {
-            myTickets: 3,
-            openTickets: 2,
-            closedTickets: 15,
-        },
-        engineer: {
-            assignedTickets: 5,
-            pendingService: 3,
-            completedToday: 2,
-        },
-        supervisor: {
-            pendingVerification: 8,
-            approvedToday: 4,
-            rejectedToday: 1,
-        },
-        admin: {
-            totalEquipment: 156,
-            totalTickets: 342,
-            activeUsers: 24,
-            openTickets: 18,
-        },
-    };
+    // Real stats from API
+    const [stats, setStats] = useState({
+        user: { myTickets: 0, openTickets: 0, closedTickets: 0 },
+        engineer: { assignedTickets: 0, pendingService: 0, completedToday: 0 },
+        supervisor: { pendingVerification: 0, approvedToday: 0, rejectedToday: 0 },
+        admin: { totalEquipment: 0, totalTickets: 0, activeUsers: 0, openTickets: 0 },
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await fetch('/api/dashboard');
+                const data = await res.json();
+                if (res.ok) {
+                    setStats({
+                        user: {
+                            myTickets: data.tickets?.total || 0,
+                            openTickets: data.tickets?.open || 0,
+                            closedTickets: data.tickets?.closed || 0,
+                        },
+                        engineer: {
+                            assignedTickets: data.tickets?.total || 0,
+                            pendingService: data.tickets?.inProgress || 0,
+                            completedToday: data.tickets?.closed || 0,
+                        },
+                        supervisor: {
+                            pendingVerification: data.tickets?.pendingVerification || 0,
+                            approvedToday: data.tickets?.closed || 0,
+                            rejectedToday: 0,
+                        },
+                        admin: {
+                            totalEquipment: data.equipment?.total || 0,
+                            totalTickets: data.tickets?.total || 0,
+                            activeUsers: data.users?.total || 0,
+                            openTickets: data.tickets?.open || 0,
+                        },
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to fetch stats:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, []);
 
     const getGreeting = () => {
         const hour = new Date().getHours();
