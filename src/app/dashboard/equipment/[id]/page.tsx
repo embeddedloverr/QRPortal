@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import QRCodeLib from 'qrcode';
 import {
     ArrowLeft,
     Wrench,
@@ -20,7 +21,7 @@ import {
     AlertTriangle,
     Download,
 } from 'lucide-react';
-import { Button, Card, Badge, Modal } from '@/components/ui';
+import { Button, Card, Badge, Modal, Input, Select } from '@/components/ui';
 
 interface Equipment {
     _id: string;
@@ -40,9 +41,20 @@ interface Equipment {
 
 export default function EquipmentDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [equipment, setEquipment] = useState<Equipment | null>(null);
     const [loading, setLoading] = useState(true);
     const [showQRModal, setShowQRModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(searchParams.get('edit') === 'true');
+    const [saving, setSaving] = useState(false);
+    const [qrDataUrl, setQrDataUrl] = useState('');
+    const [editData, setEditData] = useState({
+        name: '',
+        status: '',
+        building: '',
+        floor: '',
+        room: '',
+    });
 
     useEffect(() => {
         fetchEquipment();
@@ -54,12 +66,59 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
             const data = await res.json();
             if (res.ok) {
                 setEquipment(data);
+                setEditData({
+                    name: data.name,
+                    status: data.status,
+                    building: data.location.building,
+                    floor: data.location.floor,
+                    room: data.location.room,
+                });
+                // Generate QR code
+                const baseUrl = 'https://service.smartdwell.in';
+                const qrUrl = `${baseUrl}/equipment/${data.qrCode}`;
+                const dataUrl = await QRCodeLib.toDataURL(qrUrl, { width: 200, margin: 2 });
+                setQrDataUrl(dataUrl);
             }
         } catch (error) {
             console.error('Error fetching equipment:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            const res = await fetch(`/api/equipment/${params.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: editData.name,
+                    status: editData.status,
+                    location: {
+                        building: editData.building,
+                        floor: editData.floor,
+                        room: editData.room,
+                    },
+                }),
+            });
+            if (res.ok) {
+                setIsEditing(false);
+                fetchEquipment();
+            }
+        } catch (error) {
+            console.error('Error saving:', error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDownloadQR = () => {
+        if (!qrDataUrl || !equipment) return;
+        const link = document.createElement('a');
+        link.download = `qr-${equipment.qrCode}.png`;
+        link.href = qrDataUrl;
+        link.click();
     };
 
     const getTypeColor = (type: string) => {
@@ -142,9 +201,18 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                         >
                             View QR
                         </Button>
-                        <Button variant="ghost" leftIcon={<Edit size={18} />}>
-                            Edit
+                        <Button
+                            variant="ghost"
+                            leftIcon={<Edit size={18} />}
+                            onClick={() => setIsEditing(!isEditing)}
+                        >
+                            {isEditing ? 'Cancel' : 'Edit'}
                         </Button>
+                        {isEditing && (
+                            <Button variant="primary" onClick={handleSave} isLoading={saving}>
+                                Save
+                            </Button>
+                        )}
                     </div>
                 </div>
             </Card>
@@ -259,9 +327,13 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
             >
                 <div className="text-center py-6">
                     <div className="inline-block p-6 bg-white rounded-2xl shadow-lg mb-4">
-                        <div className="w-48 h-48 bg-dark-100 rounded-xl flex items-center justify-center">
-                            <QrCode className="w-24 h-24 text-dark-400" />
-                        </div>
+                        {qrDataUrl ? (
+                            <img src={qrDataUrl} alt={equipment.qrCode} className="w-48 h-48" />
+                        ) : (
+                            <div className="w-48 h-48 bg-dark-100 rounded-xl flex items-center justify-center">
+                                <QrCode className="w-24 h-24 text-dark-400" />
+                            </div>
+                        )}
                     </div>
                     <p className="font-mono text-lg font-semibold text-dark-900 dark:text-white mb-2">
                         {equipment.qrCode}
@@ -269,7 +341,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                     <p className="text-sm text-dark-500 dark:text-dark-400 mb-6">
                         Scan this code to identify the equipment
                     </p>
-                    <Button variant="primary" leftIcon={<Download size={18} />}>
+                    <Button variant="primary" leftIcon={<Download size={18} />} onClick={handleDownloadQR}>
                         Download QR Code
                     </Button>
                 </div>
