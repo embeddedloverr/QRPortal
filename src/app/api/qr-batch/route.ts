@@ -36,7 +36,9 @@ export async function POST(req: NextRequest) {
         // Generate QR codes as data URLs
         const qrCodes = await Promise.all(
             equipment.map(async (eq: any) => {
-                const qrUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3001'}/equipment/${eq.qrCode}`;
+                // Get base URL from env or request
+                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || '';
+                const qrUrl = `${baseUrl}/equipment/${eq.qrCode}`;
                 const qrDataUrl = await QRCode.toDataURL(qrUrl, {
                     width: 200,
                     margin: 2,
