@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Mail, Lock, QrCode, ArrowRight } from 'lucide-react';
 import { Button, Input, Card } from '@/components/ui';
@@ -118,30 +117,7 @@ export default function LoginPage() {
                             Sign In
                         </Button>
                     </form>
-
-                    {/* Register Link */}
-                    <div className="mt-6 text-center">
-                        <p className="text-dark-500 dark:text-dark-400 text-sm">
-                            Don't have an account?{' '}
-                            <Link
-                                href="/register"
-                                className="font-medium text-primary-500 hover:text-primary-600 transition-colors"
-                            >
-                                Create one
-                            </Link>
-                        </p>
-                    </div>
                 </Card>
-
-                {/* Demo Credentials */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="mt-6 text-center text-sm text-dark-500 dark:text-dark-400"
-                >
-                    <p>Demo: admin@qrportal.com / admin123</p>
-                </motion.div>
             </motion.div>
         </div>
     );
