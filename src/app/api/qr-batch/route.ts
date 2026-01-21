@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
 
         const equipment = await Equipment.find(query)
             .select('name type qrCode location')
-            .limit(50)
             .lean();
 
         // Generate QR codes as data URLs
