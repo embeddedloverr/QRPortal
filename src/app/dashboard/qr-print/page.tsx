@@ -19,6 +19,7 @@ interface QRItem {
     type: string;
     qrCode: string;
     location: { building: string; floor: string; room: string };
+    serialNumber?: string;
     qrDataUrl: string;
 }
 
@@ -107,7 +108,9 @@ export default function QRPrintPage() {
                         <div class="label">
                             <img src="${item.qrDataUrl}" alt="QR Code" />
                             <h3>${item.name}</h3>
-                            <p>${item.location?.building} • ${item.location?.floor}</p>
+                            <p><strong>Type:</strong> ${item.type || 'N/A'}</p>
+                            <p><strong>Floor:</strong> ${item.location?.floor || 'N/A'}</p>
+                            <p><strong>S/N:</strong> ${item.serialNumber || 'N/A'}</p>
                             <p class="code">${item.qrCode}</p>
                         </div>
                     `).join('')}
@@ -208,8 +211,8 @@ export default function QRPrintPage() {
                         >
                             <Card
                                 className={`cursor-pointer transition-all ${selected.has(item._id)
-                                        ? 'ring-2 ring-primary-500 bg-primary-50/50 dark:bg-primary-900/20'
-                                        : ''
+                                    ? 'ring-2 ring-primary-500 bg-primary-50/50 dark:bg-primary-900/20'
+                                    : ''
                                     }`}
                                 onClick={() => toggleSelect(item._id)}
                             >
@@ -231,7 +234,13 @@ export default function QRPrintPage() {
                                     {item.name}
                                 </h3>
                                 <p className="text-xs text-dark-500 text-center truncate">
-                                    {item.location?.building}
+                                    <span className="font-semibold">Type:</span> {item.type || 'N/A'}
+                                </p>
+                                <p className="text-xs text-dark-500 text-center truncate">
+                                    <span className="font-semibold">Floor:</span> {item.location?.floor || 'N/A'}
+                                </p>
+                                <p className="text-xs text-dark-500 text-center truncate">
+                                    <span className="font-semibold">S/N:</span> {item.serialNumber || 'N/A'}
                                 </p>
                                 <p className="text-xs font-mono text-primary-500 text-center mt-1">
                                     {item.qrCode}

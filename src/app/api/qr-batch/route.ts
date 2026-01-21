@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
         }
 
         const equipment = await Equipment.find(query)
-            .select('name type qrCode location')
+            .select('name type qrCode location serialNumber')
             .lean();
 
         // Generate QR codes as data URLs
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
                     type: eq.type,
                     qrCode: eq.qrCode,
                     location: eq.location,
+                    serialNumber: eq.serialNumber,
                     qrDataUrl,
                 };
             })
