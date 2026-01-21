@@ -11,7 +11,7 @@ import {
     Square,
     RefreshCw,
 } from 'lucide-react';
-import { Button, Card, Input } from '@/components/ui';
+import { Button, Card, Input, Select } from '@/components/ui';
 
 interface QRItem {
     _id: string;
@@ -27,6 +27,19 @@ export default function QRPrintPage() {
     const [items, setItems] = useState<QRItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [floorFilter, setFloorFilter] = useState<string>('');
+
+    // Get unique floors from items
+    const uniqueFloors = Array.from(new Set(items.map(item => item.location?.floor).filter(Boolean))).sort();
+    const floorOptions = [
+        { value: '', label: 'All Floors' },
+        ...uniqueFloors.map(floor => ({ value: floor, label: floor }))
+    ];
+
+    // Filter items by floor
+    const filteredItems = floorFilter
+        ? items.filter(item => item.location?.floor === floorFilter)
+        : items;
 
     const fetchQRCodes = async () => {
         setLoading(true);
@@ -64,12 +77,20 @@ export default function QRPrintPage() {
     };
 
     const selectAll = () => {
-        setSelected(new Set(items.map(i => i._id)));
+        setSelected(new Set(filteredItems.map(i => i._id)));
     };
 
     const deselectAll = () => {
         setSelected(new Set());
     };
+
+    // Update selection when floor filter changes
+    useEffect(() => {
+        if (floorFilter) {
+            // When floor is selected, auto-select all items in that floor
+            setSelected(new Set(filteredItems.map(i => i._id)));
+        }
+    }, [floorFilter]);
 
     const handlePrint = () => {
         const printWindow = window.open('', '_blank');
@@ -159,8 +180,14 @@ export default function QRPrintPage() {
 
             {/* Selection Controls */}
             <Card hover={false} className="mb-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
+                        <Select
+                            options={floorOptions}
+                            value={floorFilter}
+                            onChange={(e) => setFloorFilter(e.target.value)}
+                            className="w-48"
+                        />
                         <Button
                             variant="ghost"
                             size="sm"
@@ -177,7 +204,8 @@ export default function QRPrintPage() {
                         </Button>
                     </div>
                     <p className="text-sm text-dark-500">
-                        {selected.size} of {items.length} selected
+                        {selected.size} of {filteredItems.length} selected
+                        {floorFilter && ` (Floor: ${floorFilter})`}
                     </p>
                 </div>
             </Card>
@@ -189,19 +217,19 @@ export default function QRPrintPage() {
                         <div key={i} className="skeleton h-48 rounded-2xl" />
                     ))}
                 </div>
-            ) : items.length === 0 ? (
+            ) : filteredItems.length === 0 ? (
                 <Card hover={false} className="text-center py-12">
                     <QrCode className="w-16 h-16 mx-auto text-dark-300 mb-4" />
                     <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-2">
-                        No Equipment Found
+                        {floorFilter ? 'No Equipment on This Floor' : 'No Equipment Found'}
                     </h3>
                     <p className="text-dark-500 dark:text-dark-400">
-                        Add equipment to generate QR codes
+                        {floorFilter ? 'Try selecting a different floor' : 'Add equipment to generate QR codes'}
                     </p>
                 </Card>
             ) : (
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {items.map((item, index) => (
+                    {filteredItems.map((item, index) => (
                         <motion.div
                             key={item._id}
                             initial={{ opacity: 0, scale: 0.9 }}
