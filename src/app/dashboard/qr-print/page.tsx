@@ -108,7 +108,6 @@ export default function QRPrintPage() {
                         <div class="label">
                             <img src="${item.qrDataUrl}" alt="QR Code" />
                             <h3>${item.name}</h3>
-                            <p><strong>Type:</strong> ${item.type || 'N/A'}</p>
                             <p><strong>Floor:</strong> ${item.location?.floor || 'N/A'}</p>
                             <p><strong>S/N:</strong> ${item.serialNumber || 'N/A'}</p>
                             <p class="code">${item.qrCode}</p>
@@ -233,9 +232,6 @@ export default function QRPrintPage() {
                                 <h3 className="font-medium text-dark-900 dark:text-white text-sm text-center truncate">
                                     {item.name}
                                 </h3>
-                                <p className="text-xs text-dark-500 text-center truncate">
-                                    <span className="font-semibold">Type:</span> {item.type || 'N/A'}
-                                </p>
                                 <p className="text-xs text-dark-500 text-center truncate">
                                     <span className="font-semibold">Floor:</span> {item.location?.floor || 'N/A'}
                                 </p>
